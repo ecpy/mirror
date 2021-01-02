@@ -31,10 +31,13 @@ RUN ./gradlew shadowJar
 # ------------------------------------------------------------------- #
 
 
-FROM debian:9
+FROM debian:9 as mirror-executable
 
 RUN apt-get update -q && apt-get install -qy \
-  openjdk-8-jre-headless
+  openjdk-8-jre-headless \
+  locales \
+  locales-all
+  #locale-gen --reinstall
 
 COPY --from=mirror-builder /usr/local/bin/watchman /usr/local/bin/
 RUN install -d -m 777 /usr/local/var/run/watchman
@@ -44,4 +47,10 @@ COPY --from=mirror-builder /tmp/mirror/mirror ./
 COPY --from=mirror-builder /tmp/mirror/build/libs/mirror-all.jar ./
 RUN chmod a+s /usr/sbin/useradd /usr/sbin/groupadd
 ADD docker/docker-entrypoint.sh docker-entrypoint.sh
+
+# add locales
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8 
+
 ENTRYPOINT ["./docker-entrypoint.sh"]

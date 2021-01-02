@@ -11,4 +11,6 @@ if ! (getent group "$(id -g)" >/dev/null); then
   groupadd -g "$(id -g)" "group$(id -g)"
 fi
 
+export JAVA_OPTS="-Xms1024m -Xmx1024m -Xss512K -XX:PermSize=256m -XX:MaxPermSize=256m $JAVA_OPTS -Dfile.encoding=UTF-8"
+
 exec /opt/mirror/mirror "$@"
